@@ -1,0 +1,55 @@
+# Evil Nix Plymouth Theme - Animated Logo
+
+# Animation settings
+image_quantity = 24;
+frame_rate = 12;
+frame_counter = 0;
+current_frame = 1;
+
+# Load all animation frames
+for (i = 1; i <= image_quantity; i++)
+{
+    frame_image[i] = Image(sprintf("%03d.png", i));
+}
+
+# Create sprite and position it
+evil_nix_sprite = Sprite();
+evil_nix_sprite.SetImage(frame_image[1]);
+
+# Center the logo horizontally and vertically
+logo_width = frame_image[1].GetWidth();
+logo_height = frame_image[1].GetHeight();
+evil_nix_sprite.SetX(Window.GetX() + (Window.GetWidth() / 2 - logo_width / 2));
+evil_nix_sprite.SetY(Window.GetY() + (Window.GetHeight() / 2 - logo_height / 2));
+
+# Animation refresh function
+fun refresh_callback()
+{
+    frame_counter++;
+    
+    # Update frame based on frame rate (assuming 60 FPS base)
+    if (frame_counter % (60 / frame_rate) == 0)
+    {
+        current_frame++;
+        if (current_frame > image_quantity)
+            current_frame = 1;
+        
+        evil_nix_sprite.SetImage(frame_image[current_frame]);
+    }
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);
+
+# Handle LUKS password prompts
+fun message_callback(text)
+{
+    if (text)
+    {
+        message_image = Image.Text(text, 0.8, 0.8, 0.8);
+        message_sprite = Sprite(message_image);
+        message_sprite.SetX(Window.GetX() + (Window.GetWidth() / 2 - message_image.GetWidth() / 2));
+        message_sprite.SetY(evil_nix_sprite.GetY() + logo_height + 30);
+    }
+}
+
+Plymouth.SetMessageFunction(message_callback);
